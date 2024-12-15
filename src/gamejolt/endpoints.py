@@ -48,8 +48,8 @@ Endpoints = AttrDict(
     )
 )
 
-def format_queries(url: str, /, encoding: str="utf-8", **queries):
-    return url+"?"+urlencode(queries, encoding=encoding)
+def format_queries(url: str="", /, encoding: str="utf-8", **queries):
+    return ((url and url+"?") or "")+urlencode(queries, encoding=encoding)
 
 class FormatterAbstract(object):
     def __init__(self, *, base=BASE_URL, version=API_VERSION, **kwargs):
@@ -107,7 +107,9 @@ class Formatter(FormatterAbstract):
         """
         if key in Endpoints:
             return EndpointWrapper(self, Endpoints[key])
-        return super().__getattr__(key)
+        if hasattr(super(), "__getattr__"):
+            return super().__getattr__(key)
+        raise AttributeError(f"type object '{type(self).__name__}' has no attribute '{key}'")
 
 
 class EndpointWrapper(AttrDict):
@@ -125,4 +127,6 @@ class EndpointWrapper(AttrDict):
         if key in self.endpoints:
             # maybe add repr in the future
             return lambda *args, **kwargs: self.formatter.format(self.endpoints[key], *args, **kwargs)
-        return super().__getattr__(key)
+        if hasattr(super(), "__getattr__"):
+            return super().__getattr__(key)
+        raise AttributeError(f"type object '{type(self).__name__}' has no attribute '{key}'")
