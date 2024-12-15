@@ -4,7 +4,7 @@ class AttrDict(dict):
         try:
             return self[attr]
         except KeyError:
-            raise AttributeError(attr) from None
+            raise AttributeError(f"type object '{type(self).__name__}' has no attribute '{attr}'") from None
 
     def __setattr__(self, attr, value):
         self[attr] = value
@@ -13,7 +13,7 @@ class AttrDict(dict):
         try:
             del self[attr]
         except KeyError:
-            raise AttributeError(attr) from None
+            raise AttributeError(f"type object '{type(self).__name__}' has no attribute '{attr}'") from None
 
     def __dir__(self):
         return list(self) + dir(type(self))
