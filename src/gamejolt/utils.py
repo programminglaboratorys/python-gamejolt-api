@@ -1,4 +1,5 @@
 class AttrDict(dict):
+    __slots__ = ()
     def __getattr__(self, attr):
         try:
             return self[attr]
@@ -19,3 +20,4 @@ class AttrDict(dict):
     
     def __repr__(self):
         return f"AttrDict({dict.__repr__(self)})"
+
