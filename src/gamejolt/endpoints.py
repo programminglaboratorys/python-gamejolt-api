@@ -1,5 +1,5 @@
-from utils import AttrDict # temporary
-from urllib.parse import urlencode # temporary
+from urllib.parse import urlencode
+from .utils import AttrDict
 
 BASE_URL = "https://api.gamejolt.com/api/game/"
 API_VERSION = "v1_2"
@@ -72,7 +72,7 @@ class FormatterAbstract(object):
 
         return f"{self.BASE_URL}{self.API_VERSION}{endpoint}"
 
-    def format_queries(self, /, url: str, encoding: str="utf-8", **queries: dict[str, str]) -> str:
+    def format_queries(self, /, url: str="", encoding: str="utf-8", **queries: dict[str, str]) -> str:
         """
         Formats the given URL with query parameters.
 
@@ -113,6 +113,15 @@ class Formatter(FormatterAbstract):
 
 
 class EndpointWrapper(AttrDict):
+    """
+    Wraps an Endpoint dictionary, providing a convenient way to access and format the URLs.
+
+    :param formatter: The Formatter instance to use for formatting URLs.
+    :type formatter: Formatter
+    :param endpoints: The dictionary of endpoints to wrap.
+    :type endpoints: AttrDict[str, str]
+    """
+    
     __slots__ = ("formatter",'endpoints',)
     def __init__(self, formatter: Formatter, endpoints: AttrDict[str, str]):
         self.endpoints = endpoints
