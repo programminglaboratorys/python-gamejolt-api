@@ -16,7 +16,7 @@ Functions:
 
 import hashlib
 
-from .endpoints import Formatter, format_queries
+from .endpoints import Formatter, format_queries, supported_formats
 from .models import Response
 
 def generate_signature(url: str, key: str) -> str:
@@ -89,7 +89,9 @@ class RequesterAbs(Formatter):
         Initializes the Requester with the specified private key, game ID, and response format.
         It also sets up any additional query parameters provided through kwargs.
         """
-
+        if response_format not in supported_formats:
+            raise ValueError(f"Invalid response format: {response_format}. "
+                             f"Supported formats are: {', '.join(supported_formats)}")
         super().__init__(game_id=game, format=response_format,**kwargs)
         self.private_key = key
 
