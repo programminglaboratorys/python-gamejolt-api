@@ -19,6 +19,7 @@ import hashlib
 from .endpoints import Formatter, format_queries, supported_formats
 from .models import Response
 
+
 def generate_signature(url: str, key: str) -> str:
     """
     Generates the signature for the provided URL and key.
@@ -30,10 +31,15 @@ def generate_signature(url: str, key: str) -> str:
     :return: The generated signature.
     :rtype: str
     """
-    return hashlib.md5((url + key).encode('ascii')).hexdigest()
-    #raise NotImplementedError("generate_signature() is not implemented yet")
+    return hashlib.md5((url + key).encode("ascii")).hexdigest()
 
 
+class ApiError(Exception):
+    """Base class for exceptions raised by the Game Jolt API."""
+
+    def __init__(self, message, response: Response) -> None:
+        super().__init__(message)
+        self.response = response
 
 
 class RequesterAbs(Formatter):
@@ -56,6 +62,7 @@ class RequesterAbs(Formatter):
         queries (dict[str, str]): A dictionary of additional query parameters to
             be included in the request.
     """
+
     def generate_signature(self, url: str) -> str:
         """
         Generates the signature for the provided URL and key.
@@ -67,7 +74,9 @@ class RequesterAbs(Formatter):
         """
         return generate_signature(url, self.private_key)
 
-    def __init__(self, key: str, *, game: int|str,  response_format: str = "json", **kwargs):
+    def __init__(
+        self, key: str, *, game: int | str, response_format: str = "json", **kwargs
+    ):
         """
         Initializes a new instance of the Requester class.
 
@@ -84,11 +93,12 @@ class RequesterAbs(Formatter):
         It also sets up any additional query parameters provided through kwargs.
         """
         if response_format not in supported_formats:
-            raise ValueError(f"Invalid response format: {response_format}. "
-                             f"Supported formats are: {', '.join(supported_formats)}")
-        super().__init__(game_id=game, format=response_format,**kwargs)
+            raise ValueError(
+                f"Invalid response format: {response_format}. "
+                f"Supported formats are: {', '.join(supported_formats)}"
+            )
+        super().__init__(game_id=game, format=response_format, **kwargs)
         self.private_key = key
-
 
     def format_signature(self, url: str) -> str:
         """
@@ -98,7 +108,7 @@ class RequesterAbs(Formatter):
 
         :param url: The url to append the signature to.
         :return: The url with the signature appended.
-        """ 
+        """
         return "&".join((url, format_queries(signature=self.generate_signature(url))))
 
     def post(self, url: str) -> Response:
@@ -107,11 +117,16 @@ class RequesterAbs(Formatter):
 
         :param url: The url to make the request to.
         :return: A Response object containing the result of the request.
+        :rtype: Response
+
+        :raise ApiError: If the request was not successful.
         """
         response = self._post(url)
-        evaluated_response = self.evaluate(response)
-        return Response(success=evaluated_response["success"], response=evaluated_response["response"])
-
+        evaled_response = self.evaluate(response)
+        response_model = Response.from_dict(evaled_response)
+        if not evaled_response["success"]:
+            raise ApiError(evaled_response["message"], response=response_model)
+        return response_model
 
     def _post(self, url: str) -> any:
         """
@@ -121,7 +136,7 @@ class RequesterAbs(Formatter):
         :return: The response of the request.
         :rtype: any
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def evaluate(self, response: any) -> dict:
         """
@@ -130,13 +145,15 @@ class RequesterAbs(Formatter):
         The expected output is a dict with two keys:
             - success: bool
             - response: dict
+            - message?: str
 
         The success key determines if the request was a success or not.
         The response key contains the rest of the response.
+        The message key contains the error message if the request was not successful.
 
         :param response: The response of the request.
         :type response: any
         :return: The parsed response.
         :rtype: dict
         """
-        raise NotImplementedError
+        raise NotImplementedError()
