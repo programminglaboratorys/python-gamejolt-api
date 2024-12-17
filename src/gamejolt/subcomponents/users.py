@@ -2,20 +2,17 @@
 
 from typing import overload
 
-from .helper import instance_checker
+from .helpers import instance_checker
 from ..models import User
-from .. import RequesterAbstract
+from .component import Component
 
 
-class UsersComponent:
+class UsersComponent(Component):
     """
     Users Component
 
     This component handles fetching users from the Game Jolt API.
     """
-
-    def __init__(self, requester: RequesterAbstract) -> None:
-        self.requester = requester
 
     def fetch(self, id_or_username: int | str, *ids: int) -> list[User] | User:
         """
