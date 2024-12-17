@@ -4,52 +4,43 @@ from .utils import AttrDict
 BASE_URL = "https://api.gamejolt.com/api/game/"
 API_VERSION = "v1_2"
 
-supported_formats = [ # gamejolt supported formats
-    "json",
-    "keypair",
-    "dump",
-    "xml"
-]
+supported_formats = ["json", "keypair", "dump", "xml"]  # gamejolt supported formats
 
 Endpoints = AttrDict(
-    USERS = AttrDict(
-        FETCH = "/users",
-        AUTH = "/users/auth"
+    USERS=AttrDict(FETCH="/users", AUTH="/users/auth"),
+    SESSIONS=AttrDict(
+        OPEN="/sessions/open",
+        PING="/sessions/ping",
+        CHECK="/sessions/check",
+        CLOSE="/sessions/close",
     ),
-    SESSIONS = AttrDict(
-        OPEN = "/sessions/open",
-        PING = "/sessions/ping",
-        CHECK = "/sessions/check",
-        CLOSE = "/sessions/close"
+    SCORES=AttrDict(
+        FETCH="/scores/",
+        ADD="/scores/add",
+        GET_RANK="/scores/get-rank",
+        TABLES="/scores/tables",
     ),
-    SCORES = AttrDict(
-        FETCH = "/scores/",
-        ADD = "/scores/add",
-        GET_RANK = "/scores/get-rank",
-        TABLES = "/scores/tables"
+    TROPHIES=AttrDict(
+        FETCH="/trophies",
+        ADD_ACHIEVED="/trophies/add-achieved",
+        REMOVE_ACHIEVED="/trophies/remove-achieved",
     ),
-    TROPHIES = AttrDict(
-        FETCH = "/trophies",
-        ADD_ACHIEVED = "/trophies/add-achieved",
-        REMOVE_ACHIEVED = "/trophies/remove-achieved"
+    DATASTORE=AttrDict(
+        FETCH="/data-store/fetch",
+        GET_KEYS="/data-store/get-keys",
+        REMOVE="/data-store/remove",
+        SET="/data-store/set",
+        UPDATE="/data-store/update",
     ),
-    DATASTORE = AttrDict(
-        FETCH = "/data-store/fetch",
-        GET_KEYS = "/data-store/get-keys",
-        REMOVE = "/data-store/remove",
-        SET = "/data-store/set",
-        UPDATE = "/data-store/update"
-    ),
-    FRIENDS = AttrDict(
-        FETCH = "/friends"
-    ),
-    TIME = AttrDict(
-        FETCH = "/time"
-    )
+    FRIENDS=AttrDict(FETCH="/friends"),
+    TIME=AttrDict(FETCH="/time"),
 )
 
-def format_queries(url: str="", /, encoding: str="utf-8", **queries):
-    return ((url and url+"?") or "")+urlencode(queries, encoding=encoding)
+
+def format_queries(url: str = "", /, encoding: str = "utf-8", **queries):
+
+    return ((url and url + "?") or "") + urlencode(queries, encoding=encoding)
+
 
 class FormatterAbstract(object):
 
@@ -58,7 +49,7 @@ class FormatterAbstract(object):
         self.api_version = version
         self.queries = kwargs
 
-    def format_url(self, endpoint: str="") -> str:
+    def format_url(self, endpoint: str = "") -> str:
         """
         Formats the complete URL by appending the API version and endpoint to the base URL.
 
@@ -73,7 +64,9 @@ class FormatterAbstract(object):
 
         return f"{self.base_url}{self.api_version}{endpoint}"
 
-    def format_queries(self, /, url: str="", encoding: str="utf-8", **queries: dict[str, str]) -> str:
+    def format_queries(
+        self, /, url: str = "", encoding: str = "utf-8", **queries: dict[str, str]
+    ) -> str:
         """
         Formats the given URL with query parameters.
 
@@ -89,11 +82,10 @@ class FormatterAbstract(object):
         query string is appended to the URL, separating the base URL and the query parameters
         with a '?' and joining multiple parameters with '&'.
         """
-        return format_queries(url, encoding, **(self.queries|queries))
-    
-    def format(self, endpoint: str="", **queries: dict[str, str]) -> str:
-        return self.format_queries(self.format_url(endpoint), **queries)
+        return format_queries(url, encoding, **(self.queries | queries))
 
+    def format(self, endpoint: str = "", **queries: dict[str, str]) -> str:
+        return self.format_queries(self.format_url(endpoint), **queries)
 
 
 class Formatter(FormatterAbstract):
@@ -110,7 +102,9 @@ class Formatter(FormatterAbstract):
             return EndpointWrapper(self, Endpoints[key])
         if hasattr(super(), "__getattr__"):
             return super().__getattr__(key)
-        raise AttributeError(f"type object '{type(self).__name__}' has no attribute '{key}'")
+        raise AttributeError(
+            f"type object '{type(self).__name__}' has no attribute '{key}'"
+        )
 
 
 class EndpointWrapper(AttrDict):
@@ -122,21 +116,29 @@ class EndpointWrapper(AttrDict):
     :param endpoints: The dictionary of endpoints to wrap.
     :type endpoints: AttrDict[str, str]
     """
-    
-    __slots__ = ("formatter",'endpoints',)
+
+    __slots__ = (
+        "formatter",
+        "endpoints",
+    )
+
     def __init__(self, formatter: Formatter, endpoints: AttrDict[str, str]):
         self.endpoints = endpoints
         self.formatter = formatter
-    
+
     def __dir__(self):
-        return dir(type(self))+list(self.endpoints)
-    
+        return dir(type(self)) + list(self.endpoints)
+
     def __getattr__(self, key):
         if key in self.__slots__:
             return super().__getattr__(key)
         if key in self.endpoints:
             # maybe add repr in the future
-            return lambda *args, **kwargs: self.formatter.format(self.endpoints[key], *args, **kwargs)
+            return lambda *args, **kwargs: self.formatter.format(
+                self.endpoints[key], *args, **kwargs
+            )
         if hasattr(super(), "__getattr__"):
             return super().__getattr__(key)
-        raise AttributeError(f"type object '{type(self).__name__}' has no attribute '{key}'")
+        raise AttributeError(
+            f"type object '{type(self).__name__}' has no attribute '{key}'"
+        )
