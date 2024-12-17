@@ -1,5 +1,5 @@
 from .response import Response
+from .generic_model import GenericModel
+from .users import User
 
-
-class SchameError(Exception):
-    pass
+__all__ = ["Response", "GenericModel", "User"]

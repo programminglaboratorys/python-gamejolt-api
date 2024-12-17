@@ -1,7 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from . import GenericModel
+
 
 @dataclass
-class Response:
+class Response(GenericModel):
     """
     Represents a response from a request to the Game Jolt API.
 
@@ -9,7 +11,10 @@ class Response:
     :vartype success: bool
     :var response: The response of the request.
     :vartype response: dict
+    :var message: The error message if the request was not successful (default: None).
+    :vartype message: str | None
     """
+
     success: bool
-    response: dict
-    
+    response: dict = field(repr=False)
+    message: str | None = field(default=None)
