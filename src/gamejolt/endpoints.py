@@ -1,8 +1,6 @@
 from urllib.parse import urlencode
 from .utils import AttrDict
-
-BASE_URL = "https://api.gamejolt.com/api/game/"
-API_VERSION = "v1_2"
+from .constants import API_VERSION, BASE_URL
 
 supported_formats = ["json", "keypair", "dump", "xml"]  # gamejolt supported formats
 
