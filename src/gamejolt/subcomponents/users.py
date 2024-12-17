@@ -1,28 +1,10 @@
 """This module provides the Users component for interacting with the Game Jolt API."""
 
-from typing import overload, Iterable
+from typing import overload
 
+from .helper import instance_checker
 from ..models import User
 from .. import RequesterAbstract
-
-
-def instance_checker(type: type, iterable: Iterable):
-    """
-    Checks if any element in the iterable is an instance of a given type.
-
-    This function takes a type and an iterable, and checks if any element
-    in the iterable is an instance of the specified type. It returns True
-    if at least one element matches the type, otherwise False.
-
-    :param type: The type to check against.
-    :type type: type
-    :param iterable: An iterable containing elements to check.
-    :type iterable: Iterable
-    :return: True if any element is an instance of the specified type, otherwise False.
-    :rtype: bool
-    """
-
-    return any(map(lambda obj: isinstance(obj, type), iterable))
 
 
 class UsersComponent:
