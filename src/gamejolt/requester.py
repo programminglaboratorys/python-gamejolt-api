@@ -18,6 +18,7 @@ import hashlib
 
 from .endpoints import Formatter, format_queries, supported_formats
 from .models import Response
+from .errors import ApiError
 
 
 def generate_signature(url: str, key: str) -> str:
@@ -32,14 +33,6 @@ def generate_signature(url: str, key: str) -> str:
     :rtype: str
     """
     return hashlib.md5((url + key).encode("ascii")).hexdigest()
-
-
-class ApiError(Exception):
-    """Base class for exceptions raised by the Game Jolt API."""
-
-    def __init__(self, message, response: Response) -> None:
-        super().__init__(message)
-        self.response = response
 
 
 class RequesterAbstract(Formatter):

@@ -2,7 +2,7 @@
 This module defines the User model for representing users within the Game Jolt API.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from . import GenericModel
 
 
@@ -41,18 +41,7 @@ class User(GenericModel):
     developer_name: str
     developer_website: str
     developer_description: str
-
-    @classmethod
-    def from_list(cls, data: list[dict]) -> list["User"]:
-        """
-        Creates a list of instances from a list of dictionaries.
-
-        :param data: A list of dictionaries containing the data to initialize the class instances.
-        :type data: list[dict]
-        :return: A list of instances of the class initialized with the provided dictionary data.
-        :rtype: list[User]
-        """
-        return [cls.from_dict(data) for data in data]
+    token: str | None = field(default=None)
 
     def __post_init__(self):
         self.id = int(self.id)
