@@ -38,11 +38,37 @@ Endpoints = AttrDict(
 
 
 def format_queries(url: str = "", /, encoding: str = "utf-8", **queries):
+    """
+    Formats the given URL with query parameters.
 
+    :param url: The base URL to which the queries will be appended.
+    :param encoding: The encoding to use for the query parameters. Defaults to "utf-8".
+    :param queries: The query parameters to be appended to the URL.
+    :return: The formatted URL with query parameters.
+    :rtype: str
+    """
     return ((url and url + "?") or "") + urlencode(queries, encoding=encoding)
 
 
 class FormatterAbstract(object):
+    """
+    Abstract base class for formatting API endpoints.
+
+    This class provides a basic interface for formatting URLs from API endpoints and query parameters.
+
+    Attributes
+    ----------
+        base_url (str): The base URL of the Game Jolt API.
+        api_version (str): The version of the Game Jolt API.
+        queries (dict[str, str]): A dictionary of additional query parameters to be included in the request.
+
+    Methods
+    -------
+        format(url: str = "", /, encoding: str = "utf-8", **queries) -> str:
+            Formats the given URL with query parameters.
+        format_url(endpoint: str = "") -> str:
+            Formats the complete URL by appending the API version and endpoint to the base URL.
+    """
 
     def __init__(self, *, base=BASE_URL, version=API_VERSION, **kwargs):
         self.base_url = base
@@ -85,10 +111,27 @@ class FormatterAbstract(object):
         return format_queries(url, encoding, **(self.queries | queries))
 
     def format(self, endpoint: str = "", **queries: dict[str, str]) -> str:
+        """
+        Formats the complete URL by appending the API version, endpoint, and query parameters to the base URL.
+
+        :param endpoint: The specific endpoint path to append to the base URL. (optional)
+        :type endpoint: str
+        :param queries: Additional query parameters to append to the URL. These are merged with the instance's queries.
+        :type queries: dict
+        :return: The fully formatted URL string.
+        :rtype: str
+        """
         return self.format_queries(self.format_url(endpoint), **queries)
 
 
 class Formatter(FormatterAbstract):
+    """
+    Concrete implementation of the FormatterAbstract class.
+
+    This class provides a basic interface for formatting URLs from API endpoints and query parameters.
+    It is the primary class for formatting URLs and is instantiated with the base URL and API version.
+    """
+
     def __getattr__(self, key):
         """
         Returns an attribute of the current instance, or an EndpointWrapper if key exists in the constant Endpoints.
