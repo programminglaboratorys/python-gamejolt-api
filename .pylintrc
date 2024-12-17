@@ -1,0 +1,5 @@
+
+[MESSAGES CONTROL]
+disable=redefined-builtin
+[FORMAT]
+max-line-length=140
