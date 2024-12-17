@@ -3,7 +3,7 @@
 from typing import overload, Iterable
 
 from ..models import User
-from . import RequesterAbs
+from .. import RequesterAbstract
 
 
 def instance_checker(type: type, iterable: Iterable):
@@ -32,7 +32,7 @@ class UsersComponent:
     This component handles fetching users from the Game Jolt API.
     """
 
-    def __init__(self, requester: RequesterAbs) -> None:
+    def __init__(self, requester: RequesterAbstract) -> None:
         self.requester = requester
 
     def fetch(self, id_or_username: int | str, *ids: int) -> list[User] | User:

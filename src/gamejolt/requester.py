@@ -7,7 +7,7 @@ Additionally, the module offers tools for formatting URLs with query
 parameters, and evaluating the responses of API requests.
 
 Classes:
-    RequesterAbs: An abstract base class for making requests to the Game Jolt API.
+    RequesterAbstract: An abstract base class for making requests to the Game Jolt API.
     Response: Represents a response from a request to the Game Jolt API.
 
 Functions:
@@ -42,7 +42,7 @@ class ApiError(Exception):
         self.response = response
 
 
-class RequesterAbs(Formatter):
+class RequesterAbstract(Formatter):
     """
     Abstract base class for making requests to the Game Jolt API.
 
@@ -110,6 +110,20 @@ class RequesterAbs(Formatter):
         :return: The url with the signature appended.
         """
         return "&".join((url, format_queries(signature=self.generate_signature(url))))
+
+    def format(self, endpoint: str = "", **queries: dict[str, str]) -> str:
+        """
+        Appends the signature to the url.
+        the function expects the url to be already formatted with query parameters
+        otherwise you will get an invalid url
+
+        :param endpoint: The endpoint to append the signature to.
+        :type endpoint: str
+        :param queries: The query parameters to append to the endpoint.
+        :type queries: dict[str, str]
+        :return: The url with the signature appended.
+        """
+        return self.format_signature(super().format(endpoint, **queries))
 
     def post(self, url: str) -> Response:
         """
