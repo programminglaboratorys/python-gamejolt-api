@@ -44,7 +44,8 @@ class RequesterAbs(Formatter):
     append it to the URL. It also provides a method for evaluating the response
     of the request.
 
-    Attributes:
+    Attributes
+    -----------
         private_key (str): The private key to be used for generating request
             signatures.
         game (int or str): The game ID to be included in requests. Can be an
@@ -54,13 +55,6 @@ class RequesterAbs(Formatter):
         api_version (str): The version of the Game Jolt API.
         queries (dict[str, str]): A dictionary of additional query parameters to
             be included in the request.
-
-    Methods:
-        evaluate(response: any) -> dict: Parses the response of the request.
-        _post(url: str) -> any: Makes a POST request to the provided url.
-        post(url: str) -> Response: Makes a POST request to the provided url and
-            parses the response.
-        format_signature(url: str) -> str: Appends the signature to the url.
     """
     def generate_signature(self, url: str) -> str:
         """
