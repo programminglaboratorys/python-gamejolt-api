@@ -52,11 +52,12 @@ def format_queries(url: str="", /, encoding: str="utf-8", **queries):
     return ((url and url+"?") or "")+urlencode(queries, encoding=encoding)
 
 class FormatterAbstract(object):
+
     def __init__(self, *, base=BASE_URL, version=API_VERSION, **kwargs):
-        self.BASE_URL = base
-        self.API_VERSION = version
+        self.base_url = base
+        self.api_version = version
         self.queries = kwargs
-    
+
     def format_url(self, endpoint: str="") -> str:
         """
         Formats the complete URL by appending the API version and endpoint to the base URL.
@@ -70,7 +71,7 @@ class FormatterAbstract(object):
         When an endpoint is provided, it is appended to the base URL and version, forming a complete URL.
         """
 
-        return f"{self.BASE_URL}{self.API_VERSION}{endpoint}"
+        return f"{self.base_url}{self.api_version}{endpoint}"
 
     def format_queries(self, /, url: str="", encoding: str="utf-8", **queries: dict[str, str]) -> str:
         """
