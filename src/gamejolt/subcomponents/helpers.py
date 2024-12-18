@@ -3,6 +3,7 @@
 from typing import Iterable
 from functools import wraps
 from ..constants import VERSIONS
+from ..models import User
 
 
 def instance_checker(type: type, iterable: Iterable):
@@ -47,5 +48,21 @@ def api_version_guard(api_version: str):
             return func(self, *args, **kwargs)
 
         return inner
+
+    return wrapper
+
+
+def token_required(func):
+    """Decorator for checking if a user token is provided.
+
+    will raise a ValueError if the user token is not provided
+    it expects the first argument to be a user
+    """
+
+    @wraps(func)
+    def wrapper(self, user: User, *args, **kwargs):
+        if user.token is None:
+            raise ValueError("A user token is required.")
+        return func(self, user, *args, **kwargs)
 
     return wrapper
