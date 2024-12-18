@@ -38,7 +38,7 @@ class UsersComponent(Component):
         rp = self.requester.post(url)
         if len(users) == 1:
             return User.from_dict(rp.response["users"][0])
-        return [User.from_dict(user) for user in rp.response["users"]]
+        return User.from_list(rp.response["users"])
 
     @overload
     def fetch(self, id: int) -> User:

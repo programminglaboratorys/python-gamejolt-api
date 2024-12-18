@@ -14,6 +14,7 @@ from .helpers import api_version_guard
 
 
 # TODO: add overload for add_achieved, remove_achieved so it can take id as int, or it could take a trophy object
+# TODO: support multiple trophies
 class TrophiesComponent(Component):
     """Trophies Component
 
