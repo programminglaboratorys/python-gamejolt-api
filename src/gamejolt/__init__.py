@@ -11,6 +11,19 @@ the signature for the request and append it to the URL.
 
 from .endpoints import Formatter, Endpoints
 from .requester import RequesterAbstract
-from .gamejolt import GameJolt
 
 __all__ = ["GameJolt", "Formatter", "Endpoints", "RequesterAbstract"]
+
+
+from .subcomponents import UsersComponent
+
+
+# pylint: disable=W0223
+class GameJolt(RequesterAbstract):
+    """A class for interacting with the Game Jolt API.
+    a single namespace for all the subcomponents.
+    """
+
+    def __init__(self, key: str, *args, **kw) -> None:
+        super().__init__(key, *args, **kw)
+        self.users = UsersComponent(self)
