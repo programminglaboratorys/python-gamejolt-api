@@ -9,7 +9,7 @@ from . import GenericModel
 @dataclass
 class Trophy(GenericModel):
     """
-    Trophy Model
+    Represents Trophy
 
     This model represents a trophy in the Game Jolt API. It inherits from the GenericModel.
 

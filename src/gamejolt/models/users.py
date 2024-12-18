@@ -9,7 +9,7 @@ from . import GenericModel
 @dataclass
 class User(GenericModel):
     """
-    User Model
+    Represents User
 
     This model represents a user in the Game Jolt API. It inherits from the GenericModel
 
@@ -45,3 +45,11 @@ class User(GenericModel):
 
     def __post_init__(self):
         self.id = int(self.id)
+
+    def set_token(self, token: str):
+        """Sets the token of the user.
+
+        :param token: The token to set.
+        :type token: str
+        """
+        self.token = token

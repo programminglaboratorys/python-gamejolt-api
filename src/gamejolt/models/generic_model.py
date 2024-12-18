@@ -10,8 +10,8 @@ class GenericModel:
     A dataclass that can be used to model arbitrary data.
 
     This class is a generic dataclass that can be used to model any data. It has
-    a single method, `from_dict`, that can be used to create an instance from a
-    dictionary.
+    two methods, `from_dict` and `from_list`, that can be used to create an
+    instance from a dictionary or a list of dictionaries, respectively.
 
     Attributes:
         All attributes are determined by the dictionary passed to the `from_dict`
@@ -43,4 +43,4 @@ class GenericModel:
         :return: A list of instances of the class initialized with the provided dictionary data.
         :rtype: list[GenericModel]
         """
-        return [cls.from_dict(data) for data in data]
+        return [cls.from_dict(d) for d in data]

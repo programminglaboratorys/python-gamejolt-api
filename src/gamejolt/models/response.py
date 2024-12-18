@@ -5,7 +5,7 @@ from . import GenericModel
 @dataclass
 class Response(GenericModel):
     """
-    Represents a response from a request to the Game Jolt API.
+    Represents a response from the Game Jolt API.
 
     :var success: Whether the request was successful or not.
     :vartype success: bool
