@@ -38,9 +38,9 @@ class User(GenericModel):
     last_logged_in: str
     last_logged_in_timestamp: int
     status: str
-    developer_name: str
-    developer_website: str
-    developer_description: str
+    developer_name: str | None = field(default=None)
+    developer_website: str | None = field(default=None)
+    developer_description: str | None = field(default=None)
     token: str | None = field(default=None)
 
     def __post_init__(self):
