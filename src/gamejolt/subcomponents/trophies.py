@@ -21,7 +21,9 @@ class TrophiesComponent(Component):
     This component handles fetching trophies from the Game Jolt API.
     """
 
-    def fetch(self, user: User, trophy_id: int = None) -> list[Trophy] | Trophy:
+    def fetch(
+        self, user: User, trophy_id: int = None, *, achieved: bool = None
+    ) -> list[Trophy] | Trophy:
         """
         either fetches all trophies for the specified user, or a single trophy if trophy_id is given
 
@@ -40,6 +42,8 @@ class TrophiesComponent(Component):
         url_kwargs = {"username": user.username, "user_token": user.token}
         if trophy_id is not None:
             url_kwargs["trophy_id"] = trophy_id
+        if achieved is not None:
+            url_kwargs["achieved"] = achieved
         url = self.requester.TROPHIES.FETCH(**url_kwargs)
         response = self.requester.post(url)
         if trophy_id is not None:
