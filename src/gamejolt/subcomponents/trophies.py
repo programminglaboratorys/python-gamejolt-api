@@ -10,7 +10,7 @@ from ..errors import (
 
 from ..models import User, Trophy
 from .component import Component
-from .helpers import api_version_guard
+from .helpers import api_version_guard, token_required
 
 
 # TODO: add overload for add_achieved, remove_achieved so it can take id as int, or it could take a trophy object
@@ -21,6 +21,7 @@ class TrophiesComponent(Component):
     This component handles fetching trophies from the Game Jolt API.
     """
 
+    @token_required
     def fetch(
         self, user: User, trophy_id: int = None, *, achieved: bool = None
     ) -> list[Trophy] | Trophy:
@@ -35,10 +36,6 @@ class TrophiesComponent(Component):
         :rtype: list[Trophy] | Trophy
         :raises ValueError: If the User does not have a token set.
         """
-        if user.token is None:
-            raise ValueError(
-                "Cannot fetch trophies without a user token. make sure the User has their token set."
-            )
         url_kwargs = {"username": user.username, "user_token": user.token}
         if trophy_id is not None:
             url_kwargs["trophy_id"] = trophy_id
