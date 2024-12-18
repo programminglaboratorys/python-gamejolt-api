@@ -1,6 +1,6 @@
 """This module provides the Trophies component for interacting with the Game Jolt API."""
 
-from typing import overload
+from typing import overload, NoReturn
 from ..errors import (
     IncorrectTrophyID,
     UserAlreadyHasTrophy,
@@ -10,6 +10,7 @@ from ..errors import (
 
 from ..models import User, Trophy
 from .component import Component
+from .helpers import api_version_guard
 
 
 # TODO: add overload for add_achieved, remove_achieved so it can take id as int, or it could take a trophy object
@@ -77,7 +78,8 @@ class TrophiesComponent(Component):
         :type user: User
         :param trophy_id: The ID of the trophy to add.
         :type trophy_id: int
-        :raises ApiError: If the API request fails.
+        :raises UserAlreadyHasTrophy: If the user already has the trophy.
+        :raises IncorrectTrophyID: If the trophy ID is invalid.
         """
         url = self.requester.TROPHIES.ADD_ACHIEVED(
             username=user.username, user_token=user.token, trophy_id=trophy_id
@@ -87,6 +89,7 @@ class TrophiesComponent(Component):
         except ApiError as e:
             self._raise_error(e, trophy_id, user)
 
+    @api_version_guard("v1_2")
     def remove_achieved(self, user: User, trophy_id: int):
         """
         Removes the specified trophy from the user's achieved trophies.
@@ -95,7 +98,8 @@ class TrophiesComponent(Component):
         :type user: User
         :param trophy_id: The ID of the trophy to remove.
         :type trophy_id: int
-        :raises ApiError: If the API returns an error.
+        :raises IncorrectTrophyID: If the trophy ID is invalid.
+        :raises UserHasNotAchievedTrophy: If the user does not have the trophy.
         """
         url = self.requester.TROPHIES.REMOVE_ACHIEVED(
             username=user.username, user_token=user.token, trophy_id=trophy_id
@@ -107,7 +111,7 @@ class TrophiesComponent(Component):
 
     def _raise_error(
         self, error: ApiError, trophy_id: int = None, user: User = None
-    ) -> None:
+    ) -> NoReturn:
         """Raises the appropriate error based on the error message.
 
         :param error: The error to raise.
