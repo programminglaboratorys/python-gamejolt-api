@@ -72,6 +72,7 @@ class TrophiesComponent(Component):
         :rtype: Trophy
         """
 
+    @token_required
     def add_achieved(self, user: User, trophy_id: int):
         """
         Adds a trophy as achieved for the specified user.
@@ -92,6 +93,7 @@ class TrophiesComponent(Component):
             self._raise_error(e, trophy_id, user)
 
     @api_version_guard("v1_2")
+    @token_required
     def remove_achieved(self, user: User, trophy_id: int):
         """
         Removes the specified trophy from the user's achieved trophies.
