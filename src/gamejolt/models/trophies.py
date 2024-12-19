@@ -2,7 +2,7 @@
 This module defines the Trophy model for representing trophies within the Game Jolt API.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from . import GenericModel
 
 
@@ -25,9 +25,9 @@ class Trophy(GenericModel):
 
     id: int
     title: str
-    description: str
+    description: str = field(repr=False)
     difficulty: str
-    image_url: str
+    image_url: str = field(repr=False)
     achieved: bool | str
 
     def __post_init__(self):

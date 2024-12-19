@@ -8,13 +8,12 @@ from ..errors import (
     ApiError,
 )
 
-from ..models import User, Trophy
+from ..models import User, Trophy, Response
 from .component import Component
 from .helpers import api_version_guard, token_required
 
 
 # TODO: add overload for add_achieved, remove_achieved so it can take id as int, or it could take a trophy object
-# TODO: support multiple trophies
 class TrophiesComponent(Component):
     """Trophies Component
 
@@ -46,12 +45,13 @@ class TrophiesComponent(Component):
         :rtype: Trophy
         """
 
+    # pylint: disable=keyword-arg-before-vararg
     @token_required
     def fetch(
-        self, user: User, trophy_id: int = None, *, achieved: bool = None
+        self, user: User, trophy_id: int = None, *ids: int, **kw
     ) -> list[Trophy] | Trophy:
         """
-        either fetches all trophies for the specified user, or a single trophy if trophy_id is given
+        either fetches all trophies for the specified user, or a single trophy if trophy_id is given or more positional
 
         :param user: The user to fetch trophies for.
         :type user: User
@@ -63,12 +63,12 @@ class TrophiesComponent(Component):
         """
         url_kwargs = {"username": user.username, "user_token": user.token}
         if trophy_id is not None:
-            url_kwargs["trophy_id"] = trophy_id
-        if achieved is not None:
-            url_kwargs["achieved"] = achieved
+            url_kwargs["trophy_id"] = ",".join(map(str, [trophy_id, *ids]))
+        if kw.get("achieved") is not None:
+            url_kwargs["achieved"] = kw["achieved"]
         url = self.requester.TROPHIES.FETCH(**url_kwargs)
-        response = self.requester.post(url)
-        if trophy_id is not None:
+        response: Response = self.requester.post(url)
+        if trophy_id is not None and not ids:
             return Trophy.from_dict(response.response["trophies"][0])
         return Trophy.from_list(response.response["trophies"])
 
