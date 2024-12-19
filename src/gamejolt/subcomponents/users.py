@@ -14,32 +14,6 @@ class UsersComponent(Component):
     This component handles fetching users from the Game Jolt API.
     """
 
-    def fetch(self, id_or_username: int | str, *ids: int) -> list[User] | User:
-        """
-        Fetches one or more users.
-
-        :param id_or_username: The id or username of the user to be fetched.
-        :type id_or_username: int | str
-        :param ids: Additional ids of the users to be fetched.
-        :type ids: int
-        :return: A list of User instances if multiple users where passed, otherwise a single User instance.
-        :rtype: list[User] | User
-
-        :raises TypeError: If the iterable contains a mix of integers and strings.
-        """
-        users = [id_or_username, *ids]
-        if ids and instance_checker(int, users) and instance_checker(str, users):
-            raise TypeError("the iterable should be an array of intagers only")
-
-        if instance_checker(int, users):
-            url = self.requester.USERS.FETCH(user_id=",".join(map(str, users)))
-        else:
-            url = self.requester.USERS.FETCH(username="".join(users))
-        rp = self.requester.post(url)
-        if len(users) == 1:
-            return User.from_dict(rp.response["users"][0])
-        return User.from_list(rp.response["users"])
-
     @overload
     def fetch(self, id: int) -> User:
         """
@@ -73,6 +47,32 @@ class UsersComponent(Component):
         :rtype: list[User]
         """
 
+    def fetch(self, id_or_username: int | str, *ids: int) -> list[User] | User:
+        """
+        Fetches one or more users.
+
+        :param id_or_username: The id or username of the user to be fetched.
+        :type id_or_username: int | str
+        :param ids: Additional ids of the users to be fetched.
+        :type ids: int
+        :return: A list of User instances if multiple users where passed, otherwise a single User instance.
+        :rtype: list[User] | User
+
+        :raises TypeError: If the iterable contains a mix of integers and strings.
+        """
+        users = [id_or_username, *ids]
+        if ids and instance_checker(int, users) and instance_checker(str, users):
+            raise TypeError("the iterable should be an array of intagers only")
+
+        if instance_checker(int, users):
+            url = self.requester.USERS.FETCH(user_id=",".join(map(str, users)))
+        else:
+            url = self.requester.USERS.FETCH(username="".join(users))
+        rp = self.requester.post(url)
+        if len(users) == 1:
+            return User.from_dict(rp.response["users"][0])
+        return User.from_list(rp.response["users"])
+
     def authenticate(self, username: str, token: str):
         """
         Authenticate a user.
@@ -81,8 +81,6 @@ class UsersComponent(Component):
         :type username: str
         :param token: The token of the user to be authenticated.
         :type token: str
-        :return: A User instance.
-        :rtype: User
         """
         return self.requester.post(
             self.requester.USERS.AUTH(username=username, user_token=token)

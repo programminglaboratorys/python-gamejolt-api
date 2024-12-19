@@ -21,6 +21,31 @@ class TrophiesComponent(Component):
     This component handles fetching trophies from the Game Jolt API.
     """
 
+    @overload
+    def fetch(self, user: User, *, achieved: bool = None) -> list[Trophy]:
+        """Fetches all trophies for the specified user.
+
+        :param user: The user to fetch trophies for.
+        :type user: User
+        :param achieved: Whether to filter trophies by achieved status. (default: None)
+        :type achieved: bool
+        :return: A list of Trophy instances.
+        :rtype: list[Trophy]
+        """
+
+    @overload
+    def fetch(self, user: User, trophy_id: int, *, achieved: bool = None) -> Trophy:
+        """
+        Fetches a specific trophy for the specified user.
+
+        :param user: The user to fetch the trophy for.
+        :type user: User
+        :param trophy_id: The ID of the trophy to fetch.
+        :type trophy_id: int
+        :return: A Trophy instance.
+        :rtype: Trophy
+        """
+
     @token_required
     def fetch(
         self, user: User, trophy_id: int = None, *, achieved: bool = None
@@ -46,31 +71,6 @@ class TrophiesComponent(Component):
         if trophy_id is not None:
             return Trophy.from_dict(response.response["trophies"][0])
         return Trophy.from_list(response.response["trophies"])
-
-    @overload
-    def fetch(self, user: User, *, achieved: bool = None) -> list[Trophy]:
-        """Fetches all trophies for the specified user.
-
-        :param user: The user to fetch trophies for.
-        :type user: User
-        :param achieved: Whether to filter trophies by achieved status. (default: None)
-        :type achieved: bool
-        :return: A list of Trophy instances.
-        :rtype: list[Trophy]
-        """
-
-    @overload
-    def fetch(self, user: User, trophy_id: int, *, achieved: bool = None) -> Trophy:
-        """
-        Fetches a specific trophy for the specified user.
-
-        :param user: The user to fetch the trophy for.
-        :type user: User
-        :param trophy_id: The ID of the trophy to fetch.
-        :type trophy_id: int
-        :return: A Trophy instance.
-        :rtype: Trophy
-        """
 
     @token_required
     def add_achieved(self, user: User, trophy_id: int):
