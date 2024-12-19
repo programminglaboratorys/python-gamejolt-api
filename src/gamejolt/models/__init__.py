@@ -11,6 +11,6 @@ from .generic_model import GenericModel
 from .response import Response
 from .users import User
 from .trophies import Trophy
+from .time import Time
 
-
-__all__ = ["Response", "GenericModel", "User", "Trophy"]
+__all__ = ["Response", "GenericModel", "User", "Trophy", "Time"]
