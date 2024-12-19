@@ -20,6 +20,8 @@ from .subcomponents import (
     DataStoreComponent,
     TrophiesComponent,
     SessionsComponent,
+    TimeComponent,
+    FriendsComponent,
 )
 
 
@@ -35,3 +37,5 @@ class GameJolt(RequesterAbstract):
         self.sessions = SessionsComponent(self)
         self.trophies = TrophiesComponent(self)
         self.data_store = DataStoreComponent(self)
+        self.time = TimeComponent(self)
+        self.friends = FriendsComponent(self)

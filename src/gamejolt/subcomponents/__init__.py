@@ -9,10 +9,14 @@ from .users import UsersComponent
 from .data_store import DataStoreComponent
 from .trophies import TrophiesComponent
 from .sessions import SessionsComponent
+from .time import TimeComponent
+from .friends import FriendsComponent
 
 __all__ = [
     "UsersComponent",
     "DataStoreComponent",
     "TrophiesComponent",
     "SessionsComponent",
+    "TimeComponent",
+    "FriendsComponent",
 ]
