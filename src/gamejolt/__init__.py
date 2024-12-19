@@ -15,7 +15,12 @@ from .requester import RequesterAbstract
 __all__ = ["GameJolt", "Formatter", "Endpoints", "RequesterAbstract"]
 
 
-from .subcomponents import UsersComponent
+from .subcomponents import (
+    UsersComponent,
+    DataStoreComponent,
+    TrophiesComponent,
+    SessionsComponent,
+)
 
 
 # pylint: disable=W0223
@@ -27,3 +32,6 @@ class GameJolt(RequesterAbstract):
     def __init__(self, key: str, *args, **kw) -> None:
         super().__init__(key, *args, **kw)
         self.users = UsersComponent(self)
+        self.sessions = SessionsComponent(self)
+        self.trophies = TrophiesComponent(self)
+        self.data_store = DataStoreComponent(self)

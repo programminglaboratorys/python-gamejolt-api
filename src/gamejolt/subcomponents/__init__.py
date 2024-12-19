@@ -6,5 +6,13 @@ example: `UsersComponent` for `/users/` which is responsible for handling user-r
 """
 
 from .users import UsersComponent
+from .data_store import DataStoreComponent
+from .trophies import TrophiesComponent
+from .sessions import SessionsComponent
 
-__all__ = ["UsersComponent"]
+__all__ = [
+    "UsersComponent",
+    "DataStoreComponent",
+    "TrophiesComponent",
+    "SessionsComponent",
+]

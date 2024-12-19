@@ -32,16 +32,16 @@ class User(GenericModel):
     id: int
     type: str
     username: str
-    avatar_url: str
+    avatar_url: str = field(repr=False)
     signed_up: str
-    signed_up_timestamp: int
+    signed_up_timestamp: int = field(repr=False)
     last_logged_in: str
-    last_logged_in_timestamp: int
+    last_logged_in_timestamp: int = field(repr=False)
     status: str
-    developer_name: str | None = field(default=None)
-    developer_website: str | None = field(default=None)
-    developer_description: str | None = field(default=None)
-    token: str | None = field(default=None)
+    developer_name: str | None = field(default=None, repr=False)
+    developer_website: str | None = field(default=None, repr=False)
+    developer_description: str | None = field(default=None, repr=False)
+    token: str | None = field(default=None, repr=False)
 
     def __post_init__(self):
         self.id = int(self.id)

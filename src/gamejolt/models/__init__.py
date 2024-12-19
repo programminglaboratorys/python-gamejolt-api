@@ -12,4 +12,5 @@ from .response import Response
 from .users import User
 from .trophies import Trophy
 
+
 __all__ = ["Response", "GenericModel", "User", "Trophy"]
