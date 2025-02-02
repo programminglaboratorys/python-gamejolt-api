@@ -33,6 +33,13 @@ class DataStoreComponent(Component):
             raise ValueError(f"{key_name.capitalize()} must be provided.")
         return params
 
+    @overload
+    def fetch(self, key: str) -> str: ...
+
+    @overload
+    @token_required
+    def fetch(self, user: User, key: str) -> str: ...
+
     def fetch(self, user_or_key: User | str, key: str = None) -> str:
         """
         Fetches data from the data store.
@@ -48,13 +55,6 @@ class DataStoreComponent(Component):
         params = self.__user_or_key_checker(user_or_key, key, "key")
 
         return self.requester.post(self.requester.DATASTORE.FETCH(**params))
-
-    @overload
-    def fetch(self, key: str) -> str: ...
-
-    @overload
-    @token_required
-    def fetch(self, user: User, key: str) -> str: ...
 
     @overload
     @token_required
