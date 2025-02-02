@@ -61,14 +61,18 @@ class TrophiesComponent(Component):
         :rtype: list[Trophy] | Trophy
         :raises ValueError: If the User does not have a token set.
         """
-        url_kwargs = {"username": user.username, "user_token": user.token}
-        if trophy_id is not None:
-            url_kwargs["trophy_id"] = ",".join(map(str, [trophy_id, *ids]))
-        if kw.get("achieved") is not None:
-            url_kwargs["achieved"] = kw["achieved"]
+        url_kwargs = {
+            "username": user.username,
+            "user_token": user.token,
+            "trophies": ",".join(map(str, [trophy_id, *ids])) or None,
+            "achieved": kw.get("achieved"),
+        }
+        url_kwargs = {
+            k: v for k, v in url_kwargs.items() if v is not None
+        }  # filter None values
         url = self.requester.TROPHIES.FETCH(**url_kwargs)
-        response: Response = self.requester.post(url)
-        if trophy_id is not None and not ids:
+        response = self.requester.post(url)
+        if trophy_id is not None and not ids:  # we know that it's a single trophy
             return Trophy.from_dict(response.response["trophies"][0])
         return Trophy.from_list(response.response["trophies"])
 
@@ -130,25 +134,27 @@ class TrophiesComponent(Component):
         """
         response = error.response
         message = response.message
-        if message == "The user already has this trophy.":
-            raise UserAlreadyHasTrophy(
-                f"User {user.username} already has trophy {trophy_id}",
-                trophy_id=trophy_id,
-                user=user,
-                response=response,
-            ) from None
-        if message == "Incorrect trophy ID.":
-            raise IncorrectTrophyID(
-                f"Invalid trophy ID: {trophy_id}",
-                trophy_id=trophy_id,
-                user=user,
-                response=response,
-            ) from None
-        if message == "The user does not have this trophy.":
-            raise UserHasNotAchievedTrophy(
-                f"User {user.username} does not have trophy {trophy_id}",
-                trophy_id=trophy_id,
-                user=user,
-                response=response,
-            ) from None
-        raise error from None
+        match message:
+            case "The user already has this trophy.":
+                raise UserAlreadyHasTrophy(
+                    f"User {user.username} already has trophy {trophy_id}",
+                    trophy_id=trophy_id,
+                    user=user,
+                    response=response,
+                ) from None
+            case "Incorrect trophy ID.":
+                raise IncorrectTrophyID(
+                    f"Invalid trophy ID: {trophy_id}",
+                    trophy_id=trophy_id,
+                    user=user,
+                    response=response,
+                ) from None
+            case "The user does not have this trophy.":
+                raise UserHasNotAchievedTrophy(
+                    f"User {user.username} does not have trophy {trophy_id}",
+                    trophy_id=trophy_id,
+                    user=user,
+                    response=response,
+                ) from None
+            case _:
+                raise error from None
