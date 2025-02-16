@@ -1,10 +1,12 @@
 """This module provides the Data Store component for interacting with the Game Jolt API."""
 
-from typing import overload
+from typing import overload, Optional
 from ..models import User
 from .component import Component
 
 from .helpers import token_required, api_version_guard, VERSIONS
+
+GetKeysResult = list[dict[str, str]] | str
 
 
 class DataStoreComponent(Component):
@@ -17,16 +19,29 @@ class DataStoreComponent(Component):
     def __user_or_key_checker(
         self, user_or_key: User | str, key_value: str, key_name: str
     ) -> dict[str, str]:
+        """
+        Checks if the first parameter is a user or a str, and builds a parameter dictionary accordingly.
+        used in overload functions to either assign user auth or the key to the parameter dictionary
+
+        :param user_or_key: A User or a str. If a User, it will be the user to get the key from/for. If a str, it will be the key.
+        :type user_or_key: User | str
+        :param key_value: The value for the key.
+        :type key_value: str
+        :param key_name: The name of the key to be used in the parameter dictionary.
+        :type key_name: str
+        :return: A dictionary with the parameters.
+        :rtype: dict[str, str]
+        """
         params = {key_name: key_value}
 
-        if isinstance(user_or_key, User):
-            user: User = user_or_key  # assist for the reader
+        if isinstance(user_or_key, User):  # it's a user
+            user = user_or_key  # assist for the reader
             params["username"] = user.username
             params["user_token"] = user.token
 
             if user.token is None:
                 raise ValueError("User must have a token set.")
-        else:
+        else:  # it's a key
             params[key_name] = user_or_key
 
         if params[key_name] is None:
@@ -34,11 +49,29 @@ class DataStoreComponent(Component):
         return params
 
     @overload
-    def fetch(self, key: str) -> str: ...
+    def fetch(self, key: str) -> str:
+        """
+        Fetches data from the data store globally.
+
+        :param key: The key of the data item to fetch.
+        :type key: str
+        :return: The data fetched from the data store.
+        :rtype: str
+        """
 
     @overload
     @token_required
-    def fetch(self, user: User, key: str) -> str: ...
+    def fetch(self, user: User, key: str) -> str:
+        """
+        Fetches data from the data store for a user.
+
+        :param user: The user to fetch the data for.
+        :type user: User
+        :param key: The key of the data item to fetch.
+        :type key: str
+        :return: The data item as a string.
+        :rtype: str
+        """
 
     def fetch(self, user_or_key: User | str, key: str = None) -> str:
         """
@@ -104,10 +137,33 @@ class DataStoreComponent(Component):
         self.requester.post(self.requester.DATASTORE.SET(**params))
 
     @overload
-    def update(self, key: str, operation: str, value: str | int): ...
+    def update(self, key: str, operation: str, value: str | int):
+        """
+        Updates data in the data store globally.
+
+        :param key: The key of the data item to update.
+        :type key: str
+        :param operation: The operation to apply to the data item.
+        :type operation: str
+        :param value: The value to apply to the data item.
+        :type value: str | int
+        """
 
     @overload
-    def update(self, user: User, key: str, operation: str, value: str | int): ...
+    @token_required
+    def update(self, user: User, key: str, operation: str, value: str | int):
+        """
+        Updates data in the data store for a user.
+
+        :param user: The user to update the data for.
+        :type user: User
+        :param key: The key of the data item to update.
+        :type key: str
+        :param operation: The operation to apply to the data item.
+        :type operation: str
+        :param value: The value to apply to the data item.
+        :type value: str | int
+        """
 
     def update(self, user_or_key: User | str, operation_or_key: str, *args):
         # key: str, operation: str, value: str | int
@@ -173,22 +229,68 @@ class DataStoreComponent(Component):
         return self.requester.post(self.requester.DATASTORE.REMOVE(**params))
 
     @overload
-    def get_keys(self, pattern: str) -> list[dict[str, str]] | str: ...
+    def get_keys(self) -> GetKeysResult:
+        """
+        Gets a list of keys from the data store globally.
+
+        :return: A list of keys from the data store.
+        :rtype: list[dict[str, str]] | str
+
+        return a string if there is no keys or a list of dictionaries
+        example: [{"key":"test"},{"key":"version"}]
+        """
+
+    @overload
+    @token_required
+    def get_keys(self, user: User) -> GetKeysResult:
+        """
+        Gets a list of keys from the data store for a user.
+
+        :param user: The user to get the keys for.
+        :type user: User
+        :return: A list of keys from the data store.
+        :rtype: list[dict[str, str]] | str
+
+        return a string if there is no keys or a list of dictionaries
+        example: [{"key":"test"},{"key":"version"}]
+        """
+
+    @overload
+    @api_version_guard("v1_2")
+    def get_keys(self, pattern: str = "*") -> GetKeysResult:
+        """
+        Gets a list of keys from the data store globally.
+
+        :param pattern: The pattern to apply to the key names in the data store.
+        :type pattern: str
+        :return: A list of keys from the data store.
+        :rtype: list[dict[str, str]] | str
+
+        return a string if there is no keys or a list of dictionaries
+        example: [{"key":"test"},{"key":"version"}]
+        """
 
     @overload
     @api_version_guard("v1_2")
     @token_required
-    def get_keys(
-        self, user: User, pattern: str = None
-    ) -> list[dict[str, str]] | str: ...
+    def get_keys(self, user: User, pattern: str = "*") -> GetKeysResult:
+        """
+        Gets a list of keys from the data store.
 
-    @overload
-    @token_required
-    def get_keys(self, user: User) -> list[dict[str, str]] | str: ...
+        :param user: The user to get the keys for.
+        :type user: User
+        :param pattern: The pattern to apply to the key names in the data store.
+        :type pattern: str
+        :return: A list of keys from the data store.
+        :rtype: list[dict[str, str]] | str
+
+        return a string if there is no keys or a list of dictionaries
+        example: [{"key":"test"},{"key":"version"}]
+        """
 
     def get_keys(
-        self, user_or_pattern: User | str, pattern: str = None
-    ) -> list[dict[str, str]] | str:
+        self, user_or_pattern: User | str, pattern: Optional[str] = None
+    ) -> GetKeysResult:
         """
         Gets a list of keys from the data store.
 
@@ -207,7 +309,7 @@ class DataStoreComponent(Component):
         if isinstance(user_or_pattern, User):
             params["pattern"] = pattern
         if (
-            params["pattern"] is not None
+            params.get("pattern") is not None
             and VERSIONS[self.requester.api_version] < VERSIONS["v1_2"]
         ):
             raise ValueError(
