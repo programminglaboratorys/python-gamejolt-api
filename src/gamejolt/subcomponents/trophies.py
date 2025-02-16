@@ -8,12 +8,15 @@ from ..errors import (
     ApiError,
 )
 
-from ..models import User, Trophy, Response
+from ..models import User, Trophy
 from .component import Component
 from .helpers import api_version_guard, token_required
 
 
 # TODO: add overload for add_achieved, remove_achieved so it can take id as int, or it could take a trophy object
+# FIXME: fix fetch overload, it could take more than one id
+
+
 class TrophiesComponent(Component):
     """Trophies Component
 
@@ -70,8 +73,10 @@ class TrophiesComponent(Component):
         url_kwargs = {
             k: v for k, v in url_kwargs.items() if v is not None
         }  # filter None values
+
         url = self.requester.TROPHIES.FETCH(**url_kwargs)
         response = self.requester.post(url)
+
         if trophy_id is not None and not ids:  # we know that it's a single trophy
             return Trophy.from_dict(response.response["trophies"][0])
         return Trophy.from_list(response.response["trophies"])
