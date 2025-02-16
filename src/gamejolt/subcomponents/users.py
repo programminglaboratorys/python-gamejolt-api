@@ -3,7 +3,7 @@
 from typing import overload
 
 from .helpers import instance_checker
-from ..models import User
+from ..models import User, Response
 from .component import Component
 
 
@@ -47,21 +47,18 @@ class UsersComponent(Component):
         :rtype: list[User]
         """
 
-    def fetch(self, id_or_username: int | str, *ids: int) -> list[User] | User:
+    def fetch(self, *users: int | str) -> list[User] | User:
         """
         Fetches one or more users.
 
-        :param id_or_username: The id or username of the user to be fetched.
-        :type id_or_username: int | str
-        :param ids: Additional ids of the users to be fetched.
-        :type ids: int
+        :param users: The id or username of the user to be fetched.
+        :type users: int | str
         :return: A list of User instances if multiple users where passed, otherwise a single User instance.
         :rtype: list[User] | User
 
         :raises TypeError: If the iterable contains a mix of integers and strings.
         """
-        users = [id_or_username, *ids]
-        if ids and instance_checker(int, users) and instance_checker(str, users):
+        if instance_checker(int, users) and instance_checker(str, users):
             raise TypeError("the iterable should be an array of intagers only")
 
         if instance_checker(int, users):
@@ -73,7 +70,7 @@ class UsersComponent(Component):
             return User.from_dict(rp.response["users"][0])
         return User.from_list(rp.response["users"])
 
-    def authenticate(self, username: str, token: str):
+    def authenticate(self, username: str, token: str) -> Response:
         """
         Authenticate a user.
 
